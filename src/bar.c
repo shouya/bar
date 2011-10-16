@@ -1,7 +1,11 @@
+#include <dlfcn.h>
+
 #include <bar.h>
 
 #include <ui.h>
 #include <export.h>
+
+
 
 int main(int argc, char** argv) {
   init_game();
@@ -11,4 +15,6 @@ int main(int argc, char** argv) {
 
   destroy_ui();
   destroy_game();
+
+  return 0;
 }

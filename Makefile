@@ -1,4 +1,5 @@
 CC = gcc
+AR = ar
 CFLAGS = -Wall -ansi
 LIBS = -lSDL
 
@@ -29,18 +30,23 @@ CFLAGS += -I$(INC_DIR)
 
 test: all
 
-all: libbar
+all: libbar.so demo
 
 
-libbar: $(OBJECTS)
-	gcc $(CFLAGS) -o $(LIB_DIR)/$@ $^ $(LIBS)
+libbar.so: $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS) -shared -fpic
+
+demo:
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@	\
+	 game/demo/demo_export.c $(BIN_DIR)/libbar.so
+
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -f $(BIN_DIR)/*
-	rm -f $(OBJ_DIR)/*.o
+	rm -f $(SRC_DIR)/*.o
 
 rebuild: clean all
 

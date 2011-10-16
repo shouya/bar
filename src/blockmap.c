@@ -135,7 +135,7 @@ int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz) {
 }
 
 void kill_bm_lines(struct blockmap_t* bm, const int* lnbuf, int len) {
-  int n = 0, i, j;
+  int n = 0, j;
   for (; n != len; ++n) {
     for (j = lnbuf[n]-1; j >= 0; ++j) {
       memcpy(&(bm->buf[(j+1)*bm->w]), &(bm->buf[j*bm->w]),
