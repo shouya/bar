@@ -21,12 +21,18 @@ void destroy_blockmap(struct blockmap_t* bm) {
 
 struct shapebuf_t* create_shapebuf(int shape) {
   struct shapebuf_t* sb;
+  int i, j;
   sb = calloc(1, sizeof(struct shapebuf_t));
   sb->w = SHAPE_W;
   sb->h = SHAPE_H;
   sb->x = sb->y = sb->rotate = 0;
+  sb->shape = shape;
   sb->buf = calloc(SHAPE_W*SHAPE_H, sizeof(unsigned char));
-  memcpy(sb->buf, g_shps[shape].pix, SHAPE_W*SHAPE_H * sizeof(unsigned char));
+  for (i = 0; i != SHAPE_W; ++i) {
+    for (j = 0; j != SHAPE_H; ++j) {
+      sb->buf[j*SHAPE_W+i] = g_shps[shape].pix[j][i];
+    }
+  }
   return sb;
 }
 
@@ -89,11 +95,12 @@ int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
   for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
-/*        printf("something in %d, %d (%d).", i, j, sb->shape);*/
         x = i + sb->x;
         y = j + sb->y;
-        if (x<0 || x>=bm->w || y<0 || y>=bm->h) return -1;
-        if (bm->buf[y*bm->w+x].occupied) {
+        if (x<0 || x>=bm->w || y<0 || y>=bm->h) {
+          printf("it dead 'cause it over lap: %d, %d\n", x, y);
+          return -1;
+        } else if (bm->buf[y*bm->w+x].occupied) {
           return -1;
         }
       } /* if sb->buf[j][i] */

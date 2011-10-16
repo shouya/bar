@@ -1,4 +1,6 @@
 /* a simple block game demo, only can drop and clear lines */
+#include <stdlib.h>
+#include <time.h>
 
 #include <config.h>
 #include <shape.h>
@@ -7,10 +9,6 @@
 #include <canvas.h>
 #include <ui.h>
 
-/**/
-#include <graphic.h>
-#include <SDL/SDL.h>
-/**/
 
 #include <export.h>
 
@@ -38,6 +36,8 @@ static void demo_kbd(int k, int mod);
 #define YRES 20
 
 void init_game(void) {
+  srand(time(NULL));
+
   game.game_name = "Demo";
   game.author_name = "Ya Shou";
   game.author_email = "zxyzxy12321@gmail.com";
@@ -57,6 +57,7 @@ void init_game(void) {
   impl.queue = create_queue(7, 7);
   impl.sb = create_shapebuf(shift_queue(impl.queue));
   impl.sb->x = (impl.bm->w-impl.sb->w)/2;
+  printf("got %d as %d\n", impl.sb->shape, impl.sb->x);
   impl.cvs = create_canvas(BOX_SZ*XRES, BOX_SZ*YRES);
 
   demo_ctrl.repeat_on = 1;
@@ -85,10 +86,10 @@ static void demo_automove(void) {
   }
 }
 
-static void demo_render_render(void) {/*
+static void demo_render_render(void) {
   draw_bm(impl.cvs, impl.bm, 0, 0, BOX_SZ, 0x7f7f7f7f, 0xff);
-  draw_sb(impl.cvs, impl.sb, 0, 0, BOX_SZ, 0xff7f7f7f, 0xe0);*/
-  fillrect(impl.cvs, 4, 2, 30, 40, UNPACK_RGBA(rand()%0xffffffff));
+  draw_sb(impl.cvs, impl.sb, 0, 0, BOX_SZ, 0xff7f7f7f, 0xe0);/*
+                                                               fillrect(impl.cvs, 4, 2, 30, 40, UNPACK_RGBA(rand()%0xffffffff));*/
   blit_ui(impl.cvs, 0, 0);
 }
 

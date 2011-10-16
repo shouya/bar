@@ -16,7 +16,7 @@
 struct canvas_t* create_canvas(int w, int h) {
   struct canvas_t* cvs;
   SDL_Surface* sfc = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32,
-                                          UNPACK_RGBA(0x00ffffff));
+                                          0xff<<16, 0xff<<8, 0xff, 0);
   if (!sfc) {
     return NULL;
   }

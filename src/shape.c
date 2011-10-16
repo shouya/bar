@@ -43,13 +43,13 @@ void default_init_shapes(void) {
 
 void fillpixels(unsigned char pix[SHAPE_H][SHAPE_W],
                 int (*coord)[2], int num) {
-  int j = 0, i, n;
+  int j, i, n;
   
-  for (; j != SHAPE_H; ++j) {
+  for (j = 0; j != SHAPE_H; ++j) {
     for (i = 0; i != SHAPE_W; ++i) {
       pix[j][i] = 0;
       for (n = 0; n != num; ++n) {
-        if (coord[0][n] == i && coord[1][n] == j) {
+        if (coord[n][0] == i && coord[n][1] == j) {
           pix[j][i] = 1;
         }
       } /* end of each coord */
