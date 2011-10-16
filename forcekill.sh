@@ -1,3 +1,3 @@
 #!/bin/bash
 
-kill -9 `ps | grep libbar | awk '{print $1}'` 
+kill -9 `ps | grep demo | awk '{print $1}'` 

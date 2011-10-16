@@ -35,12 +35,14 @@ void drawpixel(struct canvas_t* canvas, int x, int y, PARAM_RGBA) {
     g = (g*a + PIXG(o)*(0xff-a))>>8;
     b = (b*a + PIXB(o)*(0xff-a))>>8;
   }
+
   ((Uint32*)canvas->sfc->pixels)
     [y*canvas->sfc->clip_rect.w+x] = PACK_RGB(r,g,b);
 }
 
 void drawrect(struct canvas_t* canvas, int x, int y, int w, int h, PARAM_RGBA) {
   int i;
+
   for (i = x; i != x+w; ++i) {
     drawpixel(canvas, i, y, r, g, b, a);
     drawpixel(canvas, i, y+h-1, r, g, b, a);

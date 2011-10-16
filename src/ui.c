@@ -50,7 +50,7 @@ void destroy_ui(void) {
 void main_loop(void) {
   SDL_Event event;
   int quit = 0;
-  unsigned long tick = 0;
+  unsigned long tick = SDL_GetTicks();
 
   while (!quit) {
     if (SDL_PollEvent(&event)) {
@@ -89,6 +89,7 @@ void main_loop(void) {
     } else {
       update();
     }
+    SDL_Delay(10);
   } /* while no quit */
 }
 

@@ -50,12 +50,12 @@ void blit_canvas(struct canvas_t* dest, struct canvas_t* src, int x, int y) {
 }
 
 
-void blit_ui(struct ui_t* ui, struct canvas_t* canvas, int x, int y) {
+void blit_ui(struct canvas_t* canvas, int x, int y) {
   SDL_Rect dstrect = {x, y};
-  if (!(ui && canvas)) return;
-  if (!(ui->scr && canvas->sfc)) return;
+  if (!canvas) return;
+  if (!canvas->sfc) return;
 
-  SDL_BlitSurface(canvas->sfc, NULL, ui->scr, &dstrect);
+  SDL_BlitSurface(canvas->sfc, NULL, g_ui->scr, &dstrect);
 }
 
 void draw_block(struct canvas_t* cvs, const struct block_t* blk,

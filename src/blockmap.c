@@ -86,9 +86,10 @@ void move_sb(struct shapebuf_t* sb, int offx, int offy) {
 
 int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
   int i, j, x, y;
-  for (j = 0; j != sb->h; ++i) {
+  for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
+/*        printf("something in %d, %d (%d).", i, j, sb->shape);*/
         x = i + sb->x;
         y = j + sb->y;
         if (x<0 || x>=bm->w || y<0 || y>=bm->h) return -1;
@@ -103,7 +104,7 @@ int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
 
 void merge_sb(struct blockmap_t* bm, const struct shapebuf_t* sb) {
   int i, j, x, y;
-  for (j = 0; j != sb->h; ++i) {
+  for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
         x = i + sb->x;

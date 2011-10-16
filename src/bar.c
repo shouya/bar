@@ -9,11 +9,9 @@
 
 int main(int argc, char** argv) {
   init_game();
-  init_ui();
 
   main_loop();
 
-  destroy_ui();
   destroy_game();
 
   return 0;

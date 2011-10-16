@@ -12,7 +12,7 @@ WORK_DIR = `pwd`
 SOURCES = $(wildcard src/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
-DEBUG = no
+DEBUG = yes
 PROFILE = no
 OPTIMIZATION = -O3
 

@@ -19,7 +19,7 @@ struct canvas_t* load_image(const char* path);
 void destroy_canvas(struct canvas_t* canvas);
 void blit_canvas(struct canvas_t* dest, struct canvas_t* src, int x, int y);
 
-void blit_ui(struct ui_t* ui, struct canvas_t* canvas, int x, int y);
+void blit_ui(struct canvas_t* canvas, int x, int y);
 
 void draw_block(struct canvas_t* cvs, const struct block_t* blk,
                 int x, int y, int sz, unsigned long outln, int alpha);
