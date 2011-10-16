@@ -14,8 +14,6 @@ extern struct game_t {
 } game;
 
 extern void init_game(void);
-
-extern void load_default_config(void);
-
+extern void destroy_game(void);
 
 #endif /* _export_h_ */

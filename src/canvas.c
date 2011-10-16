@@ -32,7 +32,7 @@ struct canvas_t* load_image(const char* path) {
   return 0;
 }
 
-void destory_canvas(struct canvas_t* canvas) {
+void destroy_canvas(struct canvas_t* canvas) {
   if (!canvas) return;
   if (canvas->sfc) {
     SDL_FreeSurface(canvas->sfc);

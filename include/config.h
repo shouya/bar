@@ -31,7 +31,6 @@ struct config_t {
   struct control_handler_t* ctrl;
   struct event_handler_t* event;
   struct render_handler_t* render;
-  int break_main_mainloop;
 };
 
 

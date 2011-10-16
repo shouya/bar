@@ -16,7 +16,7 @@ void graphic_init(void);
 
 struct canvas_t* create_canvas(int w, int h);
 struct canvas_t* load_image(const char* path);
-void destory_canvas(struct canvas_t* canvas);
+void destroy_canvas(struct canvas_t* canvas);
 void blit_canvas(struct canvas_t* dest, struct canvas_t* src, int x, int y);
 
 void blit_ui(struct ui_t* ui, struct canvas_t* canvas, int x, int y);

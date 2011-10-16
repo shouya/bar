@@ -16,6 +16,12 @@ struct queue_t* create_queue(int range, int capacity) {
   return q;
 }
 
+void destroy_queue(struct queue_t* queue) {
+  free(queue->queue);
+  free(queue);
+}
+
+
 int shift_queue(struct queue_t* q) {
   if (q->size == 0) {
     regen_queue(q);

@@ -14,7 +14,7 @@ struct blockmap_t* create_blockmap(int w, int h) {
   return bm;
 }
 
-void destory_blockmap(struct blockmap_t* bm) {
+void destroy_blockmap(struct blockmap_t* bm) {
   free(bm->buf);
   free(bm);
 }
@@ -30,7 +30,7 @@ struct shapebuf_t* create_shapebuf(int shape) {
   return sb;
 }
 
-void destory_shapebuf(struct shapebuf_t* sb) {
+void destroy_shapebuf(struct shapebuf_t* sb) {
   free(sb->buf);
   free(sb);
 }

@@ -37,6 +37,8 @@ void init_game(void) {
   game.author_email = "zxyzxy12321@gmail.com";
   game.impl = &impl;
   
+  default_init_shapes();
+
   impl.bm = create_blockmap(XRES, YRES);
   impl.queue = create_queue(7, 7);
   impl.sb = create_shapebuf(shift_queue(impl.queue));
@@ -54,9 +56,7 @@ void init_game(void) {
 
   demo_event.kbd_handler = &demo_kbd;
   demo_event.quit_handler = 0;
-}
 
-void load_default_config(void) {
   g_cfg.scrw = 300;
   g_cfg.scrh = 400;
   g_cfg.ctrl = &demo_ctrl;
@@ -113,4 +113,12 @@ static void demo_kbd(int k, int mod) {
     break;
   default:;
   }
+}
+
+void destroy_game(void) {
+  destroy_blockmap(impl.bm);
+  destroy_canvas(impl.cvs);
+  destroy_shapebuf(impl.sb);
+  destroy_queue(impl.queue);
+  
 }

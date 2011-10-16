@@ -12,6 +12,7 @@ struct queue_t {
 };
 
 struct queue_t* create_queue(int range, int capacity);
+void destroy_queue(struct queue_t* queue);
 int shift_queue(struct queue_t* q);
 
 

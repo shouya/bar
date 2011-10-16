@@ -21,10 +21,10 @@ struct shapebuf_t {
 
 
 struct blockmap_t* create_blockmap(int w, int h);
-void destory_blockmap(struct blockmap_t* bm);
+void destroy_blockmap(struct blockmap_t* bm);
 
 struct shapebuf_t* create_shapebuf(int shape);
-void destory_shapebuf(struct shapebuf_t* sb);
+void destroy_shapebuf(struct shapebuf_t* sb);
 
 
 void rotate_sb(struct shapebuf_t* sb, int dir);

@@ -14,7 +14,7 @@ struct ui_t {
 extern struct ui_t* g_ui;
 
 
-int init_ui(int w, int h, const char* gamename);
+int init_ui(void);
 void destroy_ui(void);
 
 void main_loop(void);
