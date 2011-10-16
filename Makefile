@@ -5,11 +5,11 @@ LIBS = -lSDL
 BIN_DIR = bin
 SRC_DIR = src
 INC_DIR = include
-OBJ_DIR = obj
+LIB_DIR = lib
 WORK_DIR = `pwd`
 
 SOURCES = $(wildcard src/*.c)
-OBJECTS = $(subst, $(SRC_DIR)/,$(OBJ_DIR)/, $(subst .c,.o,$(SOURCES)))
+OBJECTS = $(SOURCES:.c=.o)
 
 DEBUG = no
 PROFILE = no
@@ -36,7 +36,7 @@ libbar: $(OBJECTS)
 	gcc $(CFLAGS) -o $(LIB_DIR)/$@ $^ $(LIBS)
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $(WORK_DIR)/$(OBJ_DIR)/$@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -f $(BIN_DIR)/*

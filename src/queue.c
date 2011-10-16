@@ -1,10 +1,11 @@
+#include <stdlib.h>
+
 #include <queue.h>
 
 static void regen_queue(struct queue_t* q);
 
-
 struct queue_t* create_queue(int range, int capacity) {
-  queue_t* q;
+  struct queue_t* q;
   if (capacity > range) { return 0; }
   q = calloc(1, sizeof(struct queue_t));
   q->capacity = capacity;

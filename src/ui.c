@@ -7,6 +7,11 @@
 
 ui_t* g_ui = 0;
 
+static void clrscr(void);
+static void update(void);
+static void quit_handler(int* quit);
+static void automove(void);
+
 int init_ui(int w, int h) {
   if (g_ui) {
     return -1;
@@ -23,6 +28,11 @@ int init_ui(int w, int h) {
 
   SDL_WM_SetCaption(g_cfg->name);
 
+  if (g_cfg->ctrl->repeat_on != 0) {
+    SDL_EnableKeyRepeat(g_cfg->ctrl->repeat_delay,
+                        g_cfg->ctrl->repeat_interval);
+  }
+
   return 0;
 }
 
@@ -37,7 +47,61 @@ void destroy_ui(void) {
 
 
 void mainloop(void) {
-  if (g_cfg.render) {
-    (*g_cfg->render->clrscr)();
-  }
+  SDL_Event event;
+  int quit = 0;
+  unsigned long tick = 0;
+
+  while (!quit) {
+    if (SDL_PoolEvent(event)) {
+      switch (event.type) {
+      case SDL_QUIT:
+        if (g_cfg->event->quit_handler) {
+          (*g_cfg->event->quit_handler )(&quit);
+        } else {
+          quit_handler(&quit);
+        }
+        break;
+      case SDL_KEYDOWN:
+        if (g_cfg->event->kbd_handler) {
+          (*g_cfg->event->kbd_handler)(event.key.keysym.sym,
+                                       event.key.keysym.mod);
+        }
+        break;
+      default:;
+      }
+    }
+
+    if (SDL_GetTicks() - tick > g_cfg->ctrl->automove_interval) {
+      (*g_cfg->ctrl->automove)();
+    }
+
+    if (g_cfg->render->clrscr) {
+      (*g_cfg->render->clrscr)();
+    } else {
+      clrscr();
+    }
+
+    (*g_cfg.render->render)();
+
+    if (g_cfg->render->update) {
+      (*g_cfg->render->update)();
+    } else {
+      update();
+    }
+  } /* while no quit */
 }
+
+void clrscr(void) {
+  SDL_FillRect(g_ui->scr, 0, 0);
+}
+
+void update(void) {
+  SDL_Flip(g_ui->scr);
+}
+
+void quit_handler(int* quit) {
+  *quit = 1;
+}
+
+
+

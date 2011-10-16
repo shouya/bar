@@ -10,7 +10,7 @@ struct blockmap_t* create_blockmap(int w, int h) {
   struct blockmap_t* bm;
   bm = calloc(1, sizeof(struct blockmap_t));
   bm->buf = calloc(w*h, sizeof(struct block_t));
-  bm->mapw = w; bm->maph = h;
+  bm->w = w; bm->h = h;
   return bm;
 }
 
@@ -24,7 +24,7 @@ struct shapebuf_t* create_shapebuf(int shape) {
   sb = calloc(1, sizeof(struct shapebuf_t));
   sb->w = SHAPE_W;
   sb->h = SHAPE_H;
-  sb->x = sb->y = b->rotate = 0;
+  sb->x = sb->y = sb->rotate = 0;
   sb->buf = calloc(SHAPE_W*SHAPE_H, sizeof(unsigned char));
   memcpy(sb->buf, g_shps[shape].pix, SHAPE_W*SHAPE_H * sizeof(unsigned char));
   return sb;
@@ -63,7 +63,8 @@ void rotate_sb(struct shapebuf_t* sb, int dir) {
 
   /* now swap w with h*/
   if (dir) {
-    sb->w ^= sb->h ^= sb->w ^= sb->h;
+    int tmp = sb->w;
+    sb->w = sb->h; sb->h = tmp;
   }
 
   /* set the new position of pixels */
@@ -83,7 +84,7 @@ void move_sb(struct shapebuf_t* sb, int offx, int offy) {
   sb->y += offy;
 }
 
-int check_sb(const struct blockmap_t* bm, const srtuct shapebuf_t* sb) {
+int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
   int i, j, x, y;
   for (j = 0; j != sb->h; ++i) {
     for (i = 0; i != sb->w; ++i) {
@@ -116,7 +117,7 @@ void merge_sb(struct blockmap_t* bm, const struct shapebuf_t* sb) {
 int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz) {
   int i, j, fullline, num = 0;
   for (j = bm->h-1; j >= 0; --j) {
-    fulline = 1;
+    fullline = 1;
     for (i = 0; i != bm->w; ++i) {
       if (!bm->buf[j*bm->w+i].occupied) {
         fullline = 0;
@@ -133,11 +134,12 @@ int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz) {
   return num;
 }
 
-void kill_bm_lines(struct blockmap_t* tm, const int* lnbuf, int len) {
+void kill_bm_lines(struct blockmap_t* bm, const int* lnbuf, int len) {
   int n = 0, i, j;
   for (; n != len; ++n) {
     for (j = lnbuf[n]-1; j >= 0; ++j) {
-      memcpy(tm->buf[j+1], bm->buf[j], sizeof(struct block_t) * bm->w);
+      memcpy(&(bm->buf[(j+1)*bm->w]), &(bm->buf[j*bm->w]),
+             sizeof(struct block_t) * bm->w);
     } /* for each line above */
   } /* for each line in linebuf */
 }

@@ -1,18 +1,12 @@
 #include <SDL/SDL.h>
 
-#ifdef ALLOW_IMAGE
-#include <SDL/image.h>
-#endif /* ALLOW IMAGE */
 #ifdef ALLOW_TTF
 #include <SDL/ttf.h>
 #define FONT_FILENAME "share/fonts/ubuntu-light.ttf"
 #endif /* ALLOW TTF */
 
 #include <graphic.h>
-
-struct canvas_t {
-  struct SDL_Surface* sfc;
-};
+#include <canvas.h>
 
 #ifdef ALLOW_TTF
 TTF_Font* g_font;
@@ -30,76 +24,44 @@ void graphic_init(void) {
 #endif
 }
 
-
-struct canvas_t* create_canvas(int w, int h) {
-  struct canvas_t* cvs;
-  SDL_Surface* sfc = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32
-                                          UNPACK_RGBA(0x00ffffff));
-  if (!sfc) {
-    return NULL;
-  }
-  cvs = calloc(1, sizeof(struct canvas_t));
-  cvs->sfc = sfc;
-  return cvs;
-}
-
-struct canvas_t* load_image(const char* path) {
-#ifdef ALLOW_IMAGE
-  return 0;
-#endif /* ALLOW_IMAGE */
-  return 0;
-}
-
-void destory_canvas(struct canvas_t* canvas) {
-  if (!canvas) return;
-  if (canvas->sfc) {
-    SDL_FreeSurface(canvas->sfc);
-  }
-  free(canvas);
-}
-
-void blit_canvas(struct canvas_t* dest, struct canvas_t* src, int x, int y) {
-  SDL_Rect dstrect;
-  if (!(dest && src)) return;
-  if (!(dest->sfc && src->sfc)) return;
-
-  dstrect.x = x; dstrect.y = y;
-  SDL_BlitSurface(src->sfc, NULL, dest->sfc, &dstrect);
-}
-
 void drawpixel(struct canvas_t* canvas, int x, int y, PARAM_RGBA) {
   if (!canvas || !canvas->sfc) return;
   if (x<0 || y<0 || x>=canvas->sfc->clip_rect.w ||
       y>=canvas->sfc->clip_rect.h) return;
 
   if (a != 0xff) {
-    Uint32 o = ((Uint32*)canvas->sfc->pixels)[y*sfc->clip_rect.w+x];
+    Uint32 o = ((Uint32*)canvas->sfc->pixels)[y*canvas->sfc->clip_rect.w+x];
     r = (r*a + PIXR(o)*(0xff-a))>>8;
     g = (g*a + PIXG(o)*(0xff-a))>>8;
     b = (b*a + PIXB(o)*(0xff-a))>>8;
   }
   ((Uint32*)canvas->sfc->pixels)
-    [y*canvas->sfc->clip_rect.w+x] = PIXRGB(r,g,b);
+    [y*canvas->sfc->clip_rect.w+x] = PACK_RGB(r,g,b);
 }
 
 void drawrect(struct canvas_t* canvas, int x, int y, int w, int h, PARAM_RGBA) {
   int i;
   for (i = x; i != x+w; ++i) {
-    drawpixel(canvas->sfc, i, y, r, g, b, a);
-    drawpixel(canvas->sfc, i, y+h-1, r, g, b, a);
+    drawpixel(canvas, i, y, r, g, b, a);
+    drawpixel(canvas, i, y+h-1, r, g, b, a);
   }
   for (i = y+1; i != y+h-1; ++i) {
-    drawpixel(canvas->sfc, x, i, r, g, b, a);
-    drawpixel(canvas->sfc, x+w-1, i, r, g, b, a);
+    drawpixel(canvas, x, i, r, g, b, a);
+    drawpixel(canvas, x+w-1, i, r, g, b, a);
   }
 }
 
-void fillrect(struct canvas_t* canvas, int x, int y, int w, int h, PRARM_RGBA) {
-  int i, j;
-  for (i = x; i != x+w; ++i) {
-    for (j = y; j != y+h; ++j) {
-      drawpixel(canvas->sfc, i, j, r, g, b, a);
+void fillrect(struct canvas_t* canvas, int x, int y, int w, int h, PARAM_RGBA) {
+  if (a != 0xff) {
+    int i, j;
+    for (i = x; i != x+w; ++i) {
+      for (j = y; j != y+h; ++j) {
+        drawpixel(canvas, i, j, r, g, b, a);
+      }
     }
+  } else {
+    SDL_Rect rct = { x, y, w, h };
+    SDL_FillRect(canvas->sfc, &rct, PACK_RGB(r,g,b));
   }
 }
 

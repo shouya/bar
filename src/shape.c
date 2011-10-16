@@ -36,7 +36,7 @@ void default_init_shapes(void) {
     g_shps[i].no = i;
     fillpixels(g_shps[i].pix, shp_pix[i], 4);
     g_shps[i].w = shp_sz[i][0];
-    g_shps[i].h = shp_sz[i][1]
+    g_shps[i].h = shp_sz[i][1];
     g_shps[i].color = shp_color[i];
   }
 }

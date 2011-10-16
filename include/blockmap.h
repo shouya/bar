@@ -9,14 +9,14 @@ struct block_t {
 };
 
 struct blockmap_t {
-  int mapw, maph;
-  block_t** buf;
+  int w, h;
+  struct block_t* buf;
 };
 
 
 struct shapebuf_t {
   int w, h, shape, rotate, x, y;
-  unsigned char** buf;
+  unsigned char* buf;
 };
 
 
@@ -30,9 +30,10 @@ void destory_shapebuf(struct shapebuf_t* sb);
 void rotate_sb(struct shapebuf_t* sb, int dir);
 void move_sb(struct shapebuf_t* sb, int offx, int offy);
 
-int check_sb(const struct blockmap_t* bm, const srtuct shapebuf_t* sb);
+int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb);
 void merge_sb(struct blockmap_t* bm, const struct shapebuf_t* sb);
 
 int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz);
-void kill_bm_lines(struct blockmap_t* tm, const int* lnbuf, int len)
+void kill_bm_lines(struct blockmap_t* bm, const int* lnbuf, int len);
+
 #endif /* _blockmap_h_ */
