@@ -1,4 +1,4 @@
-/* header guard generate by genhead.pl */
+/* header guard generate by genheader.pl */
 #ifndef _queue_h_
 #define _queue_h_
 

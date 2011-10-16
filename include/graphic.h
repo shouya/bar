@@ -1,4 +1,4 @@
-/* header guard generate by genhead.pl */
+/* header guard generate by genheader.pl */
 #ifndef _graphic_h_
 #define _graphic_h_
 

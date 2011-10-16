@@ -1,4 +1,4 @@
-/* header guard generate by genhead.pl */
+/* header guard generate by genheader.pl */
 #ifndef _ui_h_
 #define _ui_h_
 

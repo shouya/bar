@@ -1,4 +1,4 @@
-/* header guard generate by genhead.pl */
+/* header guard generate by genheader.pl */
 #ifndef _blockmap_h_
 #define _blockmap_h_
 
