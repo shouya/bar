@@ -9,6 +9,7 @@ struct shape_t {
   int no;
   unsigned char pix[SHAPE_H][SHAPE_W];
   unsigned long color;
+  int w, h;
 };
 
 extern struct shape_t* g_shps;

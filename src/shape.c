@@ -18,6 +18,10 @@ static int shp_pix[][4][2] = {
   /*T*/{{0,0},{1,0},{2,0},{1,1}},
 };
 
+static int shp_sz[][2] = {
+  {2,2}, {1,4}, {2,3}, {2,3}, {3,2}, {3,2}, {3,2}
+};
+
 static unsigned long shp_color[] = {
   /*O:Yello I:Cyan  L:Orange J:Blue Z: Red    S:Lime  T:Purple*/
   0xffff00, 0xffff, 0xff7f00, 0xff, 0xff0000, 0xff00, 0x7f007f
@@ -31,6 +35,8 @@ void default_init_shapes(void) {
   for (; i != g_numshp; ++i) {
     g_shps[i].no = i;
     fillpixels(g_shps[i].pix, shp_pix[i], 4);
+    g_shps[i].w = shp_sz[i][0];
+    g_shps[i].h = shp_sz[i][1]
     g_shps[i].color = shp_color[i];
   }
 }
