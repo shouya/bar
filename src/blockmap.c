@@ -59,7 +59,6 @@ void rotate_sb(struct shapebuf_t* sb, int dir) {
     for (j = 0; j != sb->h; ++j) {
       if (sb->buf[j*sb->w+i]) {
         if (dir == 1) { /* clock wise 90' */
-          printf("h: %d, w: %d\n", sb->h, sb->w);
           xb[p] = sb->h - (j+1);
           yb[p] = i;
         } else if (dir == -1) { /* counter clockwise 90' */

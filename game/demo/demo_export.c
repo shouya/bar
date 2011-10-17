@@ -57,7 +57,6 @@ void init_game(void) {
   impl.queue = create_queue(7, 7);
   impl.sb = create_shapebuf(shift_queue(impl.queue));
   impl.sb->x = (impl.bm->w-impl.sb->w)/2;
-  printf("got %d as %d\n", impl.sb->shape, impl.sb->x);
   impl.cvs = create_canvas(BOX_SZ*XRES, BOX_SZ*YRES);
 
   demo_ctrl.repeat_on = 1;
@@ -96,25 +95,25 @@ static void demo_render_render(void) {
 
 static void demo_kbd(int k, int mod) {
   switch (k) {
-  case 'w':
+  case BARK_UP:
     rotate_sb(impl.sb, 1);
     if (check_sb(impl.bm, impl.sb) != 0) {
       rotate_sb(impl.sb, -1);
     }
     break;
-  case 's':
+  case BARK_DOWN:
     move_sb(impl.sb, 0, 1);
     if (check_sb(impl.bm, impl.sb) != 0) {
       move_sb(impl.sb, 0, -1);
     }
     break;
-  case 'a':
+  case BARK_LEFT:
     move_sb(impl.sb, -1, 0);
     if (check_sb(impl.bm, impl.sb) != 0) {
       move_sb(impl.sb, 1, 0);
     }
     break;
-  case 'd':
+  case BARK_RIGHT:
     move_sb(impl.sb, 1, 0);
     if (check_sb(impl.bm, impl.sb) != 0) {
       move_sb(impl.sb, -1, 0);
