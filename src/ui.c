@@ -74,6 +74,7 @@ void main_loop(void) {
 
     if (SDL_GetTicks() - tick > g_cfg.ctrl->automove_interval) {
       (*g_cfg.ctrl->automove)();
+      tick = SDL_GetTicks();
     }
 
     if (g_cfg.render->clrscr) {

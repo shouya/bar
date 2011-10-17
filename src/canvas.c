@@ -25,6 +25,10 @@ struct canvas_t* create_canvas(int w, int h) {
   return cvs;
 }
 
+void clear_canvas(struct canvas_t* canvas, unsigned long color) {
+  SDL_FillRect(canvas->sfc, NULL, color);
+}
+
 struct canvas_t* load_image(const char* path) {
 #ifdef ALLOW_IMAGE
   return 0;
@@ -75,21 +79,32 @@ void draw_sb(struct canvas_t* cvs, const struct shapebuf_t* sb,
   for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
-        draw_block(cvs, &blk, x + i*sz, y + j*sz, sz, outline, alpha);
+        draw_block(cvs, &blk, x + (sb->x+i)*sz, y + (sb->y+j)*sz,
+                   sz, outline, alpha);
       }
     }
   }
 }
 
-void draw_bm(struct canvas_t* cvs, const struct blockmap_t* sb,
+void draw_bm(struct canvas_t* cvs, const struct blockmap_t* bm,
              int x, int y, int sz, unsigned long outline, int alpha) {
   int i, j;
-  for (i = 0; i != sb->w; ++i) {
-    for (j = 0; j != sb->h; ++j) {
-      if (sb->buf[j*sb->w+i].occupied) {
-        draw_block(cvs, &(sb->buf[j*sb->w+i]),
-                   x+i*sz, y+i*sz, sz, outline, alpha);
+  for (i = 0; i != bm->w; ++i) {
+    for (j = 0; j != bm->h; ++j) {
+      if (bm->buf[j*bm->w+i].occupied) {
+        draw_block(cvs, &(bm->buf[j*bm->w+i]),
+                   x+i*sz, y+j*sz, sz, outline, alpha);
       }
+    }
+  }
+}
+
+void draw_grid(struct canvas_t* cvs, const struct blockmap_t* bm,
+               int x, int y, int sz, unsigned long color) {
+  int i, j;
+  for (i = 0; i != bm->w; ++i) {
+    for (j = 0; j != bm->h; ++j) {
+      drawrect(cvs, x+i*sz, y+j*sz, sz, sz, UNPACK_RGBA(color));
     }
   }
 }

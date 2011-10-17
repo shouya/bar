@@ -24,6 +24,7 @@ struct blockmap_t* create_blockmap(int w, int h);
 void destroy_blockmap(struct blockmap_t* bm);
 
 struct shapebuf_t* create_shapebuf(int shape);
+void reset_shapebuf(struct shapebuf_t* sb, int new_shape);
 void destroy_shapebuf(struct shapebuf_t* sb);
 
 

@@ -87,9 +87,10 @@ static void demo_automove(void) {
 }
 
 static void demo_render_render(void) {
+  clear_canvas(impl.cvs, 0x0);
   draw_bm(impl.cvs, impl.bm, 0, 0, BOX_SZ, 0x7f7f7f7f, 0xff);
-  draw_sb(impl.cvs, impl.sb, 0, 0, BOX_SZ, 0xff7f7f7f, 0xe0);/*
-                                                               fillrect(impl.cvs, 4, 2, 30, 40, UNPACK_RGBA(rand()%0xffffffff));*/
+  draw_sb(impl.cvs, impl.sb, 0, 0, BOX_SZ, 0xff7f7f7f, 0xe0);
+  draw_grid(impl.cvs, impl.bm, 0, 0, BOX_SZ, 0x30ffffff);
   blit_ui(impl.cvs, 0, 0);
 }
 

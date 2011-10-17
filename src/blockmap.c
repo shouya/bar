@@ -21,20 +21,26 @@ void destroy_blockmap(struct blockmap_t* bm) {
 
 struct shapebuf_t* create_shapebuf(int shape) {
   struct shapebuf_t* sb;
-  int i, j;
   sb = calloc(1, sizeof(struct shapebuf_t));
-  sb->w = SHAPE_W;
-  sb->h = SHAPE_H;
-  sb->x = sb->y = sb->rotate = 0;
-  sb->shape = shape;
-  sb->buf = calloc(SHAPE_W*SHAPE_H, sizeof(unsigned char));
-  for (i = 0; i != SHAPE_W; ++i) {
-    for (j = 0; j != SHAPE_H; ++j) {
-      sb->buf[j*SHAPE_W+i] = g_shps[shape].pix[j][i];
-    }
-  }
+  reset_shapebuf(sb, shape);
   return sb;
 }
+
+void reset_shapebuf(struct shapebuf_t* sb, int new_shape) {
+  int i, j;
+  sb->w = g_shps[new_shape].w;
+  sb->h = g_shps[new_shape].h;
+  if (sb->buf) free(sb->buf);
+  sb->buf = calloc(sb->w * sb->h, sizeof(unsigned char));
+  sb->x = sb->y = sb->rotate = 0;
+  sb->shape = new_shape;
+  for (i = 0; i != sb->w; ++i) {
+    for (j = 0; j != sb->h; ++j) {
+      sb->buf[j*sb->w+i] = g_shps[new_shape].pix[j][i];
+    }
+  }
+}
+
 
 void destroy_shapebuf(struct shapebuf_t* sb) {
   free(sb->buf);
@@ -53,6 +59,7 @@ void rotate_sb(struct shapebuf_t* sb, int dir) {
     for (j = 0; j != sb->h; ++j) {
       if (sb->buf[j*sb->w+i]) {
         if (dir == 1) { /* clock wise 90' */
+          printf("h: %d, w: %d\n", sb->h, sb->w);
           xb[p] = sb->h - (j+1);
           yb[p] = i;
         } else if (dir == -1) { /* counter clockwise 90' */
@@ -98,10 +105,9 @@ int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
         x = i + sb->x;
         y = j + sb->y;
         if (x<0 || x>=bm->w || y<0 || y>=bm->h) {
-          printf("it dead 'cause it over lap: %d, %d\n", x, y);
           return -1;
         } else if (bm->buf[y*bm->w+x].occupied) {
-          return -1;
+          return -2;
         }
       } /* if sb->buf[j][i] */
     } /* for i */
@@ -111,12 +117,15 @@ int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
 
 void merge_sb(struct blockmap_t* bm, const struct shapebuf_t* sb) {
   int i, j, x, y;
+  if (check_sb(bm, sb) != 0) return;
+
   for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
         x = i + sb->x;
         y = j + sb->y;
         bm->buf[y*bm->w+x].occupied = 1;
+        bm->buf[y*bm->w+x].shape = sb->shape;
       } /* if sb->buf[j][i] */
     } /* for i */
   }   /* for j */

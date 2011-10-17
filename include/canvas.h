@@ -16,6 +16,7 @@ void graphic_init(void);
 
 struct canvas_t* create_canvas(int w, int h);
 struct canvas_t* load_image(const char* path);
+void clear_canvas(struct canvas_t* canvas, unsigned long color);
 void destroy_canvas(struct canvas_t* canvas);
 void blit_canvas(struct canvas_t* dest, struct canvas_t* src, int x, int y);
 
@@ -25,7 +26,11 @@ void draw_block(struct canvas_t* cvs, const struct block_t* blk,
                 int x, int y, int sz, unsigned long outln, int alpha);
 void draw_sb(struct canvas_t* cvs, const struct shapebuf_t* sb,
              int x, int y, int sz, unsigned long outline, int alpha);
-void draw_bm(struct canvas_t* cvs, const struct blockmap_t* sb,
+void draw_bm(struct canvas_t* cvs, const struct blockmap_t* bm,
              int x, int y, int sz, unsigned long outline, int alpha);
+void draw_grid(struct canvas_t* cvs, const struct blockmap_t* bm,
+               int x, int y, int sz, unsigned long color);
+
+
 
 #endif /* _canvas_h_ */
