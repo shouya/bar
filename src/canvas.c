@@ -67,10 +67,12 @@ void draw_block(struct canvas_t* cvs, const struct block_t* blk,
                 unsigned long outline, int alpha) {
   if (g_cfg.render->draw_block) {
     (*g_cfg.render->draw_block)(cvs, blk, x, y, sz, outline, alpha);
-  } else {
-    fillrect(cvs, x, y, sz, sz, UNPACK_RGB(g_shps[blk->shape].color), alpha);
-    drawrect(cvs, x, y, sz, sz, UNPACK_RGBA(outline));
+    return;
   }
+  if (!blk->occupied) return;
+
+  draw_box(cvs, x, y, sz, sz, outline,
+            (g_shps[blk->shape].color | PACKA(alpha)));
 }
 void draw_sb(struct canvas_t* cvs, const struct shapebuf_t* sb,
              int x, int y, int sz, unsigned long outline, int alpha) {
@@ -105,6 +107,34 @@ void draw_grid(struct canvas_t* cvs, const struct blockmap_t* bm,
   for (i = 0; i != bm->w; ++i) {
     for (j = 0; j != bm->h; ++j) {
       drawrect(cvs, x+i*sz, y+j*sz, sz, sz, UNPACK_RGBA(color));
+    }
+  }
+}
+
+void draw_box(struct canvas_t* cvs, int x, int y, int w, int h,
+               unsigned long outln, unsigned long fill) {
+  if (PIXA(fill) != 0) {
+    fillrect(cvs, x, y, w, h, UNPACK_RGBA(fill));
+  }
+  if (PIXA(outln) != 0) {
+    drawrect(cvs, x, y, w, h, UNPACK_RGBA(outln));
+  }
+}
+
+void draw_shape(struct canvas_t* cvs, int x, int y, int sz, int shp,
+                unsigned long outln, int alpha) {
+/* todo , check if shp > 0 and < *** */
+
+  int i, j, w, h;
+  if (shp == -1) return;
+  w = g_shps[shp].w;
+  h = g_shps[shp].h;
+  for (j = 0; j != h; ++j) {
+    for (i = 0; i != w; ++i) {
+      if (g_shps[shp].pix[j][i]) {
+        draw_box(cvs, x+i*sz, y+j*sz, sz, sz, outln,
+                  (g_shps[shp].color | PACKA(alpha)));
+      }
     }
   }
 }

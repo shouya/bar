@@ -12,7 +12,7 @@
 TTF_Font* g_font;
 #endif /* ALLOW TTF */
 
-void graphic_init(void) {
+void init_graphic(void) {
 #ifdef ALLOW_IMAGE
   IMG_Init(IMG_INIT_PNG | IMG_INIT_PNG);
   atexit(&IMG_Quit);

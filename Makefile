@@ -13,7 +13,7 @@ SOURCES = $(wildcard src/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 DEBUG = no
-PROFILE = yes
+PROFILE = no
 OPTIMIZATION = -O3
 
 ifeq ($(DEBUG), yes)

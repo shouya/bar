@@ -3,6 +3,7 @@
 
 #include <blockmap.h>
 
+#include <config.h>
 #include <shape.h>
 
 
@@ -158,6 +159,22 @@ void move_sb(struct shapebuf_t* sb, int offx, int offy) {
   sb->y += offy;
 }
 
+void soft_move_sb(struct shapebuf_t* sb, int offx, int offy,
+                  struct blockmap_t* bm) {
+  move_sb(sb, offx, offy);
+  if (check_sb(bm, sb) != 0) {
+    move_sb(sb, -offx, -offy);
+  }
+}
+
+void hard_drop_sb(struct shapebuf_t* sb, struct blockmap_t* bm) {
+  while (check_sb(bm, sb) == 0) {
+    move_sb(sb, 0, 1);
+  }
+  move_sb(sb, 0, -1);
+}
+
+
 int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
   int i, j, x, y;
   for (j = 0; j != sb->h; ++j) {
@@ -214,6 +231,12 @@ int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz) {
 
 void kill_bm_lines(struct blockmap_t* bm, int* lnbuf, int len) {
   int n = 0, j, i;
+
+  if (g_cfg.ctrl->kill_bm_lines) {
+    (*g_cfg.ctrl->kill_bm_lines)(bm, lnbuf, len);
+    return;
+  }
+
   for (; n != len; ++n) {
     for (j = lnbuf[n]-1; j >= 0; --j) {
       memcpy(&(bm->buf[(j+1)*bm->w]), &(bm->buf[j*bm->w]),
@@ -222,7 +245,7 @@ void kill_bm_lines(struct blockmap_t* bm, int* lnbuf, int len) {
     for (i = n+1; i != len; ++i) {
       if (lnbuf[i] < lnbuf[n]) {
         lnbuf[i] += 1;
-        }
+      }
     } /* for each line in linebuf */
   } /* for each line above */
 }
@@ -237,3 +260,37 @@ void set_ghost(const struct blockmap_t* bm,
   }
   move_sb(ghost, 0, -1);
 }
+
+void swap_hold(int* holdbuf, struct shapebuf_t* sb,
+               const struct blockmap_t* bm, int nextshp, int lim) {
+  int swp = sb->shape;
+  if (*holdbuf == -1) {
+    *holdbuf = nextshp;
+  }
+  if (bm != NULL) {
+    soft_reset_sb(sb, *holdbuf, bm, lim);
+  } else {
+    reset_shapebuf(sb, *holdbuf);
+  }
+  *holdbuf = swp;
+}
+
+int steady_sb(struct blockmap_t* bm, struct shapebuf_t* sb,
+              int nxtshp, int lim) {
+  int lnbuf[SHAPE_H], num_clear;
+
+  merge_sb(bm, sb);
+
+  if ((num_clear = check_bm_lines(bm, lnbuf, SHAPE_H)) != 0) {
+    kill_bm_lines(bm, lnbuf, num_clear);
+  }
+
+  soft_reset_sb(sb, nxtshp, bm, lim);
+
+  if (check_sb(bm, sb) != 0) {
+    return -1;
+  } else {
+    return 0;
+  }
+}
+

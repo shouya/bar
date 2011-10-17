@@ -8,10 +8,13 @@
 #define PIXG(rgba) (((rgba)>>8)&0xff)
 #define PIXB(rgba) ((rgba)&0xff)
 #define PIXA(rgba) (((rgba)>>24)&0xff)
+#define PACKR(r) (((r)&0xff)<<16)
+#define PACKG(g) (((g)&0xff)<<8)
+#define PACKB(b) ((b)&0xff)
+#define PACKA(a) (((a)&0xff)<<24)
 #define UNPACK_RGB(rgb) PIXR(rgb), PIXG(rgb), PIXB(rgb)
 #define UNPACK_RGBA(rgba) UNPACK_RGB(rgba), PIXA(rgba)
-#define PACK_RGBA(r,g,b,a) ((((a)&0xff)<<24)|(((r)&0xff)<<16)|  \
-                            (((g)&0xff)<<8)|((b)&0xff))
+#define PACK_RGBA(r,g,b,a) (PACKR(r)|PACKG(g)|PACKB(b)|PACKA(a))
 #define PACK_RGB(r,g,b) PACK_RGBA(r,g,b,0xff)
 
 
@@ -21,6 +24,7 @@
 
 struct canvas_t;
 
+void init_graphic(void);
 
 void drawpixel(struct canvas_t* canvas, int x, int y, PARAM_RGBA);
 void drawrect(struct canvas_t* canvas, int x, int y, int w, int h, PARAM_RGBA);

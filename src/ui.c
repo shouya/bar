@@ -49,17 +49,16 @@ void destroy_ui(void) {
 
 void main_loop(void) {
   SDL_Event event;
-  int quit = 0;
   unsigned long tick = SDL_GetTicks();
 
-  while (!quit) {
+  while (!g_cfg.ctrl->quit) {
     if (SDL_PollEvent(&event)) {
       switch (event.type) {
       case SDL_QUIT:
         if (g_cfg.event->quit_handler) {
-          (*g_cfg.event->quit_handler )(&quit);
+          (*g_cfg.event->quit_handler )(&g_cfg.ctrl->quit);
         } else {
-          quit_handler(&quit);
+          quit_handler(&g_cfg.ctrl->quit);
         }
         break;
       case SDL_KEYDOWN:
@@ -73,7 +72,7 @@ void main_loop(void) {
     }
 
     if (SDL_GetTicks() - tick > g_cfg.ctrl->automove_interval) {
-      (*g_cfg.ctrl->automove)();
+      (*g_cfg.ctrl->auto_move)();
       tick = SDL_GetTicks();
     }
 

@@ -4,6 +4,7 @@
 
 struct block_t;
 struct canvas_t;
+struct blockmap_t;
 
 struct render_handler_t {
   void (*render)(void); /* essential */
@@ -17,7 +18,9 @@ struct render_handler_t {
 struct control_handler_t {
   int repeat_on, repeat_delay, repeat_interval;
   int automove_interval; /* essential */
-  void (*automove)(void); /* essential */
+  int quit;
+  void (*auto_move)(void); /* essential */
+  void (*kill_bm_lines)(struct blockmap_t* bm, int* lnbuf, int num);
 };
 
 struct event_handler_t {
