@@ -42,6 +42,27 @@ void reset_shapebuf(struct shapebuf_t* sb, int new_shape) {
 }
 
 
+void soft_reset_sb(struct shapebuf_t* sb, int new_shape,
+                   const struct blockmap_t* bm, int lim) {
+  int n = 0;
+  reset_shapebuf(sb, new_shape);
+  sb->x = (bm->w - sb->w) / 2;
+
+  do {
+    if (check_sb(bm, sb) != 0) {
+      if (n < 0) {
+        n = 1 - n;
+      } else {
+        n = -1 - n;
+      }
+      sb->x += n;
+    } else {
+      break;
+    }
+  } while (abs(n) < lim);
+
+}
+
 void destroy_shapebuf(struct shapebuf_t* sb) {
   free(sb->buf);
   free(sb);
@@ -90,6 +111,47 @@ void rotate_sb(struct shapebuf_t* sb, int dir) {
   if (sb->rotate == -1) sb->rotate = 3;
   if (sb->rotate == 4) sb->rotate = 0;
 }
+
+void soft_rotate_sb(struct shapebuf_t* sb, int dir,
+                    const struct blockmap_t* bm, int lim) {
+  int n = 0, differ = 0;
+  differ = sb->w;
+  rotate_sb(sb, dir);
+  differ -= sb->w;
+  if (differ % 2) {
+    if (differ < 0) differ -= 1;
+    else differ += 1;
+  }
+  differ /= 2;
+  sb->x += differ;
+
+
+  do {
+    if (check_sb(bm, sb) != 0) {
+      if (n < 0) {
+        n = 1 - n;
+      } else {
+        n = -1 - n;
+      }
+      sb->x += n;
+      sb->y -= 1;
+      if (check_sb(bm, sb) == 0) {
+        return;
+      }
+      sb->y += 1;
+    } else {
+      return;
+    }
+  } while (abs(n) < lim);
+
+  if (check_sb(bm, sb) != 0) {
+    sb->x -= differ + n;
+    rotate_sb(sb, -dir);
+    return;
+  }
+  /* todo: finish the lim */
+}
+
 
 void move_sb(struct shapebuf_t* sb, int offx, int offy) {
   sb->x += offx;
@@ -143,21 +205,35 @@ int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz) {
     if (fullline) {
       lnbuf[num++] = j;
       if (num >= bufsz) {
-        return -1;
+        return bufsz;
       }
     }
   }
   return num;
 }
 
-void kill_bm_lines(struct blockmap_t* bm, const int* lnbuf, int len) {
-  int n = 0, j;
+void kill_bm_lines(struct blockmap_t* bm, int* lnbuf, int len) {
+  int n = 0, j, i;
   for (; n != len; ++n) {
-    for (j = lnbuf[n]-1; j >= 0; ++j) {
+    for (j = lnbuf[n]-1; j >= 0; --j) {
       memcpy(&(bm->buf[(j+1)*bm->w]), &(bm->buf[j*bm->w]),
              sizeof(struct block_t) * bm->w);
-    } /* for each line above */
-  } /* for each line in linebuf */
+    }
+    for (i = n+1; i != len; ++i) {
+      if (lnbuf[i] < lnbuf[n]) {
+        lnbuf[i] += 1;
+        }
+    } /* for each line in linebuf */
+  } /* for each line above */
 }
 
 
+void set_ghost(const struct blockmap_t* bm,
+               const struct shapebuf_t* sb,
+               struct shapebuf_t* ghost) {
+  memcpy(ghost, sb, sizeof(struct shapebuf_t));
+  while (check_sb(bm, ghost) == 0) {
+    move_sb(ghost, 0, 1);
+  }
+  move_sb(ghost, 0, -1);
+}

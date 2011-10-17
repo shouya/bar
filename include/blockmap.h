@@ -25,16 +25,24 @@ void destroy_blockmap(struct blockmap_t* bm);
 
 struct shapebuf_t* create_shapebuf(int shape);
 void reset_shapebuf(struct shapebuf_t* sb, int new_shape);
+void soft_reset_sb(struct shapebuf_t* sb, int new_shape,
+                   const struct blockmap_t* bm, int lim);
 void destroy_shapebuf(struct shapebuf_t* sb);
 
 
 void rotate_sb(struct shapebuf_t* sb, int dir);
 void move_sb(struct shapebuf_t* sb, int offx, int offy);
+void soft_rotate_sb(struct shapebuf_t* sb, int dir,
+                    const struct blockmap_t* bm, int lim);
 
 int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb);
 void merge_sb(struct blockmap_t* bm, const struct shapebuf_t* sb);
 
 int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz);
-void kill_bm_lines(struct blockmap_t* bm, const int* lnbuf, int len);
+void kill_bm_lines(struct blockmap_t* bm, int* lnbuf, int len);
+
+void set_ghost(const struct blockmap_t* bm,
+               const struct shapebuf_t* sb,
+               struct shapebuf_t* ghost);
 
 #endif /* _blockmap_h_ */

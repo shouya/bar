@@ -12,8 +12,8 @@ WORK_DIR = `pwd`
 SOURCES = $(wildcard src/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
-DEBUG = yes
-PROFILE = no
+DEBUG = no
+PROFILE = yes
 OPTIMIZATION = -O3
 
 ifeq ($(DEBUG), yes)

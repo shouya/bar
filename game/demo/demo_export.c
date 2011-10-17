@@ -1,5 +1,6 @@
 /* a simple block game demo, only can drop and clear lines */
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <config.h>
@@ -8,7 +9,7 @@
 #include <queue.h>
 #include <canvas.h>
 #include <ui.h>
-
+#include <defines.h>
 
 #include <export.h>
 
@@ -17,7 +18,7 @@ struct game_t game;
 
 static struct game_implement {
   struct blockmap_t* bm;
-  struct shapebuf_t* sb;
+  struct shapebuf_t* sb, *ghost;
   struct queue_t* queue;
   struct canvas_t* cvs;
 } impl;
@@ -43,6 +44,19 @@ void init_game(void) {
   game.author_email = "zxyzxy12321@gmail.com";
   game.impl = &impl;
 
+  demo_ctrl.repeat_on = 1;
+  demo_ctrl.repeat_delay = demo_ctrl.repeat_interval = 100;
+  demo_ctrl.automove_interval = 300;
+  demo_ctrl.automove = &demo_automove;
+
+  demo_render.render = &demo_render_render;
+  demo_render.clrscr = 0;
+  demo_render.draw_block = 0;
+  demo_render.update = 0;
+
+  demo_event.kbd_handler = &demo_kbd;
+  demo_event.quit_handler = 0;
+
   g_cfg.scrw = 300;
   g_cfg.scrh = 400;
   g_cfg.ctrl = &demo_ctrl;
@@ -58,30 +72,28 @@ void init_game(void) {
   impl.sb = create_shapebuf(shift_queue(impl.queue));
   impl.sb->x = (impl.bm->w-impl.sb->w)/2;
   impl.cvs = create_canvas(BOX_SZ*XRES, BOX_SZ*YRES);
-
-  demo_ctrl.repeat_on = 1;
-  demo_ctrl.repeat_delay = demo_ctrl.repeat_interval = 100;
-  demo_ctrl.automove_interval = 300;
-  demo_ctrl.automove = &demo_automove;
-
-  demo_render.render = &demo_render_render;
-  demo_render.clrscr = 0;
-  demo_render.draw_block = 0;
-  demo_render.update = 0;
-
-  demo_event.kbd_handler = &demo_kbd;
-  demo_event.quit_handler = 0;
 }
 
 
 static void demo_automove(void) {
   move_sb(impl.sb, 0, 1);
   if (check_sb(impl.bm, impl.sb) != 0) {
+    int lnbuf[4], num;
     move_sb(impl.sb, 0, -1);
     merge_sb(impl.bm, impl.sb);
-    destroy_shapebuf(impl.sb);
-    impl.sb = create_shapebuf(shift_queue(impl.queue));
-    impl.sb->x = (impl.bm->w-impl.sb->w)/2;
+
+    if ((num = check_bm_lines(impl.bm, lnbuf, 4)) != 0) {
+      kill_bm_lines(impl.bm, lnbuf, num);
+    }
+
+    soft_reset_sb(impl.sb, shift_queue(impl.queue),
+                  impl.bm, 3);
+
+    if (check_sb(impl.bm, impl.sb) != 0) {
+      printf("game over\n");
+      demo_ctrl.automove_interval = -1;
+      
+    }
   }
 }
 
@@ -96,10 +108,7 @@ static void demo_render_render(void) {
 static void demo_kbd(int k, int mod) {
   switch (k) {
   case BARK_UP:
-    rotate_sb(impl.sb, 1);
-    if (check_sb(impl.bm, impl.sb) != 0) {
-      rotate_sb(impl.sb, -1);
-    }
+    soft_rotate_sb(impl.sb, 1, impl.bm, 2);
     break;
   case BARK_DOWN:
     move_sb(impl.sb, 0, 1);
