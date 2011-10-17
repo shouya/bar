@@ -6,9 +6,10 @@
 
 struct queue_t {
   int* queue;
-  int size;
   int capacity;
   int range;
+  int* randbuf;
+  int randptr;
 };
 
 struct queue_t* create_queue(int range, int capacity);

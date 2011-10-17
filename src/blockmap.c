@@ -29,6 +29,13 @@ struct shapebuf_t* create_shapebuf(int shape) {
 
 void reset_shapebuf(struct shapebuf_t* sb, int new_shape) {
   int i, j;
+  if (new_shape == -1) {
+    sb->w = sb->h = 0;
+    if (sb->buf) free(sb->buf);
+    sb->buf = 0;
+    sb->shape = -1;
+    return;
+  }
   sb->w = g_shps[new_shape].w;
   sb->h = g_shps[new_shape].h;
   if (sb->buf) free(sb->buf);
@@ -47,6 +54,9 @@ void soft_reset_sb(struct shapebuf_t* sb, int new_shape,
                    const struct blockmap_t* bm, int lim) {
   int n = 0;
   reset_shapebuf(sb, new_shape);
+
+  if (sb->shape == -1) return;
+
   sb->x = (bm->w - sb->w) / 2;
 
   do {
@@ -68,6 +78,16 @@ void destroy_shapebuf(struct shapebuf_t* sb) {
   free(sb->buf);
   free(sb);
 }
+
+void clear_blockmap(struct blockmap_t* bm) {
+  int i, j;
+  for (i = 0; i != bm->w; ++i) {
+    for (j = 0; j != bm->h; ++j) {
+      memset(&bm->buf[j*bm->w+i], 0, sizeof(struct block_t));
+    }
+  }
+}
+
 
 
 void rotate_sb(struct shapebuf_t* sb, int dir) {
@@ -115,7 +135,9 @@ void rotate_sb(struct shapebuf_t* sb, int dir) {
 
 void soft_rotate_sb(struct shapebuf_t* sb, int dir,
                     const struct blockmap_t* bm, int lim) {
-  int n = 0, differ = 0;
+  int n = 0, differ, ox;
+
+  ox = sb->x;
   differ = sb->w;
   rotate_sb(sb, dir);
   differ -= sb->w;
@@ -126,6 +148,12 @@ void soft_rotate_sb(struct shapebuf_t* sb, int dir,
   differ /= 2;
   sb->x += differ;
 
+  if (sb->x < 0) {
+    sb->x = 0;
+  }
+  if (sb->x >= bm->w) {
+    sb->x = bm->w-sb->w;
+  }
 
   do {
     if (check_sb(bm, sb) != 0) {
@@ -135,22 +163,16 @@ void soft_rotate_sb(struct shapebuf_t* sb, int dir,
         n = -1 - n;
       }
       sb->x += n;
-      sb->y -= 1;
-      if (check_sb(bm, sb) == 0) {
-        return;
-      }
-      sb->y += 1;
     } else {
       return;
     }
   } while (abs(n) < lim);
 
   if (check_sb(bm, sb) != 0) {
-    sb->x -= differ + n;
+    sb->x = ox;
     rotate_sb(sb, -dir);
     return;
   }
-  /* todo: finish the lim */
 }
 
 
@@ -177,6 +199,7 @@ void hard_drop_sb(struct shapebuf_t* sb, struct blockmap_t* bm) {
 
 int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb) {
   int i, j, x, y;
+  if (sb->shape == -1) return -3;
   for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
@@ -261,11 +284,11 @@ void set_ghost(const struct blockmap_t* bm,
   move_sb(ghost, 0, -1);
 }
 
-void swap_hold(int* holdbuf, struct shapebuf_t* sb,
-               const struct blockmap_t* bm, int nextshp, int lim) {
+void swap_hold(int* holdbuf, struct shapebuf_t* sb, int(*getnext)(void),
+               const struct blockmap_t* bm, int lim) {
   int swp = sb->shape;
   if (*holdbuf == -1) {
-    *holdbuf = nextshp;
+    *holdbuf = (*getnext)();
   }
   if (bm != NULL) {
     soft_reset_sb(sb, *holdbuf, bm, lim);

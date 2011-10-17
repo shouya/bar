@@ -70,6 +70,7 @@ void draw_block(struct canvas_t* cvs, const struct block_t* blk,
     return;
   }
   if (!blk->occupied) return;
+  if (blk->shape == -1) return;
 
   draw_box(cvs, x, y, sz, sz, outline,
             (g_shps[blk->shape].color | PACKA(alpha)));
@@ -78,6 +79,7 @@ void draw_sb(struct canvas_t* cvs, const struct shapebuf_t* sb,
              int x, int y, int sz, unsigned long outline, int alpha) {
   int i, j;
   struct block_t blk = {1, sb->shape, 0};
+  if (sb->shape == -1) return;
   for (j = 0; j != sb->h; ++j) {
     for (i = 0; i != sb->w; ++i) {
       if (sb->buf[j*sb->w+i]) {
@@ -137,4 +139,14 @@ void draw_shape(struct canvas_t* cvs, int x, int y, int sz, int shp,
       }
     }
   }
+}
+
+void draw_shape_center(struct canvas_t* cvs, int x, int y,
+                       int boxw, int boxh, int sz, int shp,
+                       unsigned long outln, int alpha) {
+  int shpx, shpy;
+  if (shp == -1) return;
+  shpx = (boxw - g_shps[shp].w * sz) / 2 + x;
+  shpy = (boxh - g_shps[shp].h * sz) / 2 + y;
+  draw_shape(cvs, shpx, shpy, sz, shp, outln, alpha);
 }

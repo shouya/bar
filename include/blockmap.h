@@ -22,6 +22,7 @@ struct shapebuf_t {
 
 struct blockmap_t* create_blockmap(int w, int h);
 void destroy_blockmap(struct blockmap_t* bm);
+void clear_blockmap(struct blockmap_t* bm);
 
 struct shapebuf_t* create_shapebuf(int shape);
 void reset_shapebuf(struct shapebuf_t* sb, int new_shape);
@@ -48,8 +49,8 @@ void set_ghost(const struct blockmap_t* bm,
                const struct shapebuf_t* sb,
                struct shapebuf_t* ghost);
 
-void swap_hold(int* holdbuf, struct shapebuf_t* sb,
-               const struct blockmap_t* bm, int nextshp, int lim);
+void swap_hold(int* holdbuf, struct shapebuf_t* sb, int(*getnext)(void),
+               const struct blockmap_t* bm, int lim);
 
 int steady_sb(struct blockmap_t* bm, struct shapebuf_t* sb,
               int nxtshp, int lim);

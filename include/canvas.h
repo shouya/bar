@@ -33,5 +33,9 @@ void draw_box(struct canvas_t* cvs, int x, int y, int w, int h,
 void draw_shape(struct canvas_t* cvs, int x, int y, int sz, int shp,
                 unsigned long outln, int alpha);
 
+void draw_shape_center(struct canvas_t* cvs, int x, int y,
+                       int boxw, int boxh, int sz, int shp,
+                       unsigned long outln, int alpha);
+
 
 #endif /* _canvas_h_ */
