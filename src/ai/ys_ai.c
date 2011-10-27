@@ -9,13 +9,6 @@
 #include <ai.h>
 
 
-#define NOP 0
-#define MV_LEFT 1
-#define MV_RIGHT 2
-#define RT_LEFT 3
-#define RT_RIGHT 4
-#define DROP 5
-
 struct solution_t {
   int nums;
   struct solution_node_t {
@@ -66,12 +59,9 @@ struct ai_t* ai_calc(struct blockmap_t* bm, struct shapebuf_t* sb,
 }
 
 int ai_step(struct ai_t* ai, struct blockmap_t* bm, struct shapebuf_t* sb) {
-  if (sb->rotate < ai->s->best->rotate) {
+  if (sb->rotate != ai->s->best->rotate) {
     soft_rotate_sb(sb, 1, bm, 2);
     return AI_ROTATE_RIGHT;
-  } else if (sb->rotate > ai->s->best->rotate) {
-    soft_rotate_sb(sb, -1, bm, 2);
-    return AI_ROTATE_LEFT;
   }
 
   if (sb->x < ai->s->best->x_pos) {
@@ -192,7 +182,7 @@ static void best_solution(struct solution_t* solution) {
 }
 
 static int calc_bm_score(const struct blockmap_t* bm) {
-  int top = bm->h, score = 0, ln_killed, empty_cols=0, noempty = 0;
+  int top = bm->h, score = 0, ln_killed, noempty = 0;
   int i, j;
 
   if ((ln_killed = check_bm_lines(bm, NULL, 0)) != 0) {

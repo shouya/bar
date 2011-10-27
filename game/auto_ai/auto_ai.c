@@ -27,6 +27,9 @@ static struct game_implement {
   struct ai_t* ai;
 } impl;
 
+static unsigned long beg_time;
+static int lines_killed;
+
 static struct control_handler_t game_ctrl;
 static struct render_handler_t game_render;
 static struct event_handler_t game_event;
@@ -34,6 +37,7 @@ static struct event_handler_t game_event;
 static void do_auto_move(void);
 static void do_step_ai(void);
 static void do_render(void);
+static void kill_lines_hook(struct blockmap_t* bm, int* lnbuf, int num);
 
 static void dealkbd(int k, int mod);
 static void newgame(void);
@@ -56,7 +60,7 @@ void init_game(void) {
   game_ctrl.automove_interval = 300;
   game_ctrl.auto_move = &do_auto_move;
   game_ctrl.before_auto_move = &do_step_ai;
-  game_ctrl.kill_bm_lines = 0;
+  game_ctrl.kill_bm_lines = &kill_lines_hook;
   game_ctrl.quit = 0;
 
   game_render.render = &do_render;
@@ -88,15 +92,20 @@ void init_game(void) {
 }
 
 
+
 static void do_auto_move(void) {
   move_sb(impl.sb, 0, 1);
   if (check_sb(impl.bm, impl.sb) != 0) {
     move_sb(impl.sb, 0, -1);
+    lines_killed += check_bm_lines(impl.bm, 0, 0);
     if (steady_sb(impl.bm, impl.sb, shift_queue(impl.queue), 3) != 0) {
-      printf("game over, you may press C-n to start a new game.\n");
+      /*printf("game over, you may press C-n to start a new game.\n");*/
+      printf("this AI cleared lines: %d, spend: %.2fs\n", lines_killed,
+             (util_getticks()-beg_time)/1000.0f);
       game_ctrl.automove_interval = -1;
       clear_blockmap(impl.bm);
       reset_shapebuf(impl.sb, -1);
+      newgame();
     } else {
       impl.ai = ai_calc(impl.bm, impl.sb, 0, 0);
     }
@@ -105,8 +114,8 @@ static void do_auto_move(void) {
 
 static void do_step_ai(void) {
   static unsigned long tick = 0;
-  if (util_getticks() - tick >= 100) {
-    /*printf("%d\n", */ai_step(impl.ai, impl.bm, impl.sb);/*);*/
+  if (util_getticks() - tick >= 1) {
+    ai_step(impl.ai, impl.bm, impl.sb);
     tick = util_getticks();
   }
 }
@@ -163,5 +172,13 @@ static void newgame(void) {
   clear_blockmap(impl.bm);
   soft_reset_sb(impl.sb, shift_queue(impl.queue), impl.bm, 3);
   impl.ai = ai_calc(impl.bm, impl.sb, 0, 0);
+  lines_killed = 0;
+  beg_time = util_getticks();
 }
 
+static void kill_lines_hook(struct blockmap_t* bm, int* lnbuf, int num) {
+  game_ctrl.kill_bm_lines = 0;
+  lines_killed += num;
+  kill_bm_lines(bm, lnbuf, num);
+  game_ctrl.kill_bm_lines = &kill_lines_hook;
+}
