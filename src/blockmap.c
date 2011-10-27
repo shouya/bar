@@ -274,9 +274,12 @@ int check_bm_lines(const struct blockmap_t* bm, int* lnbuf, int bufsz) {
       }
     }
     if (fullline) {
-      lnbuf[num++] = j;
-      if (num >= bufsz) {
-        return bufsz;
+      ++num;
+      if (bufsz != 0) {
+        lnbuf[num-1] = j;
+        if (num >= bufsz) {
+          return bufsz;
+        }
       }
     }
   }
