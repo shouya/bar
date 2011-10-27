@@ -23,12 +23,16 @@ struct shapebuf_t {
 struct blockmap_t* create_blockmap(int w, int h);
 void destroy_blockmap(struct blockmap_t* bm);
 void clear_blockmap(struct blockmap_t* bm);
+struct blockmap_t* clone_blockmap(const struct blockmap_t* bm);
+void copy_blockmap(struct blockmap_t* dest, const struct blockmap_t* src);
 
 struct shapebuf_t* create_shapebuf(int shape);
 void reset_shapebuf(struct shapebuf_t* sb, int new_shape);
 void soft_reset_sb(struct shapebuf_t* sb, int new_shape,
                    const struct blockmap_t* bm, int lim);
 void destroy_shapebuf(struct shapebuf_t* sb);
+struct shapebuf_t* clone_shapebuf(const struct shapebuf_t* sb);
+void copy_shapebuf(struct shapebuf_t* dest, const struct shapebuf_t* src);
 
 
 void rotate_sb(struct shapebuf_t* sb, int dir);
@@ -37,7 +41,7 @@ void soft_rotate_sb(struct shapebuf_t* sb, int dir,
                     const struct blockmap_t* bm, int lim);
 void soft_move_sb(struct shapebuf_t* sb, int offx, int offy,
                   struct blockmap_t* bm);
-void hard_drop_sb(struct shapebuf_t* sb, struct blockmap_t* bm);
+void hard_drop_sb(struct shapebuf_t* sb, const struct blockmap_t* bm);
 
 int check_sb(const struct blockmap_t* bm, const struct shapebuf_t* sb);
 void merge_sb(struct blockmap_t* bm, const struct shapebuf_t* sb);

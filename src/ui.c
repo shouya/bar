@@ -71,6 +71,10 @@ void main_loop(void) {
       }
     }
 
+    if (g_cfg.ctrl->before_auto_move) {
+      (*g_cfg.ctrl->before_auto_move)();
+    }
+
     if (SDL_GetTicks() - tick > g_cfg.ctrl->automove_interval) {
       (*g_cfg.ctrl->auto_move)();
       tick = SDL_GetTicks();

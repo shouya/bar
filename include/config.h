@@ -20,7 +20,8 @@ struct control_handler_t {
   int automove_interval; /* essential */
   int quit;
   void (*auto_move)(void); /* essential */
-  void (*kill_bm_lines)(struct blockmap_t* bm, int* lnbuf, int num);
+  void (*before_auto_move)(void); /* optional */
+  void (*kill_bm_lines)(struct blockmap_t* bm, int* lnbuf, int num); /* opt- */
 };
 
 struct event_handler_t {

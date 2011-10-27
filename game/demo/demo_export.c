@@ -171,6 +171,7 @@ void destroy_game(void) {
   destroy_canvas(impl.cvs);
   destroy_canvas(impl.pnl);
   destroy_shapebuf(impl.sb);
+  destroy_shapebuf(impl.ghost);
   destroy_queue(impl.queue);
   destroy_ui();
 }

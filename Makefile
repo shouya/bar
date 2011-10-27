@@ -9,12 +9,16 @@ INC_DIR = include
 LIB_DIR = lib
 WORK_DIR = `pwd`
 
-SOURCES = $(wildcard src/*.c)
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
-DEBUG = no
+DEBUG = yes
 PROFILE = no
 OPTIMIZATION = -O3
+
+AI=ai/ys_ai.c
+
+SOURCES += $(SRC_DIR)/$(AI)
 
 ifeq ($(DEBUG), yes)
 	OPTIMIZATION = -O0
@@ -30,7 +34,7 @@ CFLAGS += -I$(INC_DIR)
 
 test: all
 
-all: libbar.so demo
+all: libbar.so demo auto_ai
 
 
 libbar.so: $(OBJECTS)
@@ -39,6 +43,10 @@ libbar.so: $(OBJECTS)
 demo:
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@	\
 	 game/demo/demo_export.c $(BIN_DIR)/libbar.so
+
+auto_ai:
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@	\
+	 game/auto_ai/auto_ai.c $(BIN_DIR)/libbar.so
 
 
 %.o: %.c

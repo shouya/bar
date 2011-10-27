@@ -20,6 +20,19 @@ void destroy_blockmap(struct blockmap_t* bm) {
   free(bm);
 }
 
+struct blockmap_t* clone_blockmap(const struct blockmap_t* bm) {
+  struct blockmap_t* new_bm;
+  new_bm = create_blockmap(bm->w, bm->h);
+  memcpy(new_bm->buf, bm->buf, bm->w * bm->h * sizeof(struct block_t));
+
+  return new_bm;
+}
+void copy_blockmap(struct blockmap_t* dest, const struct blockmap_t* src) {
+  if (dest->w != src->w || dest->h != src->h) return;
+  memcpy(dest->buf, src->buf, src->w * src->h * sizeof(struct block_t));
+}
+
+
 struct shapebuf_t* create_shapebuf(int shape) {
   struct shapebuf_t* sb;
   sb = calloc(1, sizeof(struct shapebuf_t));
@@ -49,6 +62,29 @@ void reset_shapebuf(struct shapebuf_t* sb, int new_shape) {
   }
 }
 
+void destroy_shapebuf(struct shapebuf_t* sb) {
+  free(sb->buf);
+  free(sb);
+}
+
+struct shapebuf_t* clone_shapebuf(const struct shapebuf_t* sb) {
+  struct shapebuf_t* new_sb;
+  new_sb = calloc(1, sizeof(struct shapebuf_t));
+  new_sb->w=sb->w; new_sb->h=sb->h; new_sb->x=sb->x; new_sb->y=sb->y;
+  new_sb->rotate=sb->rotate; new_sb->shape=sb->shape;
+  new_sb->buf = calloc(sb->w * sb->h, sizeof(unsigned char));
+  memcpy(new_sb->buf, sb->buf, sizeof(unsigned char)* sb->w * sb->h);
+
+  return new_sb;
+}
+
+void copy_shapebuf(struct shapebuf_t* dest, const struct shapebuf_t* src) {
+  if (dest->w != src->w || dest->h != src->h) return;
+  memcpy(dest->buf, src->buf, sizeof(unsigned char)* src->w * src->h);
+  dest->w=src->w; dest->h=src->h; dest->x=src->x; dest->y=src->y;
+  dest->rotate=src->rotate; dest->shape=src->shape;
+}
+
 
 void soft_reset_sb(struct shapebuf_t* sb, int new_shape,
                    const struct blockmap_t* bm, int lim) {
@@ -72,11 +108,6 @@ void soft_reset_sb(struct shapebuf_t* sb, int new_shape,
     }
   } while (abs(n) < lim);
 
-}
-
-void destroy_shapebuf(struct shapebuf_t* sb) {
-  free(sb->buf);
-  free(sb);
 }
 
 void clear_blockmap(struct blockmap_t* bm) {
@@ -189,7 +220,7 @@ void soft_move_sb(struct shapebuf_t* sb, int offx, int offy,
   }
 }
 
-void hard_drop_sb(struct shapebuf_t* sb, struct blockmap_t* bm) {
+void hard_drop_sb(struct shapebuf_t* sb, const struct blockmap_t* bm) {
   while (check_sb(bm, sb) == 0) {
     move_sb(sb, 0, 1);
   }
@@ -277,11 +308,13 @@ void kill_bm_lines(struct blockmap_t* bm, int* lnbuf, int len) {
 void set_ghost(const struct blockmap_t* bm,
                const struct shapebuf_t* sb,
                struct shapebuf_t* ghost) {
-  memcpy(ghost, sb, sizeof(struct shapebuf_t));
-  while (check_sb(bm, ghost) == 0) {
-    move_sb(ghost, 0, 1);
+  if (ghost->w != sb->w || ghost->h != sb->h) {
+    free(ghost->buf);
+    ghost->buf = calloc(sb->w * sb->h, sizeof(unsigned char));
   }
-  move_sb(ghost, 0, -1);
+
+  copy_shapebuf(ghost, sb);
+  hard_drop_sb(ghost, bm);
 }
 
 void swap_hold(int* holdbuf, struct shapebuf_t* sb, int(*getnext)(void),
