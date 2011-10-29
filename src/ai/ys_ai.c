@@ -92,7 +92,10 @@ int ai_step(struct ai_t* ai, struct blockmap_t* bm, struct shapebuf_t* sb) {
 }
 
 void ai_do(struct ai_t* ai, struct blockmap_t* bm, struct shapebuf_t* sb) {
-  while (ai_step(ai, bm, sb) != AI_FREE) {}
+  int result = 0;
+  while (result = ai_step(ai, bm, sb)) {
+    if (result == AI_FREE || result == AI_DROP) return;
+  }
 }
 
 

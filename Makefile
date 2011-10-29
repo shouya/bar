@@ -13,10 +13,10 @@ SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 DEBUG = yes
-PROFILE = no
+PROFILE = yes
 OPTIMIZATION = -O3
 
-AI=ai/ys_ai.c
+AI=ai/pierre_dellacherie_ai.c
 
 SOURCES += $(SRC_DIR)/$(AI)
 

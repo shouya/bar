@@ -57,7 +57,7 @@ void init_game(void) {
   game.impl = &impl;
 
   game_ctrl.repeat_on = 0;
-  game_ctrl.automove_interval = 300;
+  game_ctrl.automove_interval = 10;
   game_ctrl.auto_move = &do_auto_move;
   game_ctrl.before_auto_move = &do_step_ai;
   game_ctrl.kill_bm_lines = &kill_lines_hook;
@@ -99,6 +99,7 @@ static void do_auto_move(void) {
     move_sb(impl.sb, 0, -1);
     lines_killed += check_bm_lines(impl.bm, 0, 0);
     if (steady_sb(impl.bm, impl.sb, shift_queue(impl.queue), 3) != 0) {
+/*    if (steady_sb(impl.bm, impl.sb, 6, 3) != 0) {*/
       /*printf("game over, you may press C-n to start a new game.\n");*/
       printf("this AI cleared lines: %d, spend: %.2fs\n", lines_killed,
              (util_getticks()-beg_time)/1000.0f);
@@ -114,7 +115,7 @@ static void do_auto_move(void) {
 
 static void do_step_ai(void) {
   static unsigned long tick = 0;
-  if (util_getticks() - tick >= 1) {
+  if (util_getticks() - tick >= 50) {
     ai_step(impl.ai, impl.bm, impl.sb);
     tick = util_getticks();
   }
@@ -171,9 +172,9 @@ static void newgame(void) {
   game_ctrl.automove_interval = 300;
   clear_blockmap(impl.bm);
   soft_reset_sb(impl.sb, shift_queue(impl.queue), impl.bm, 3);
-  impl.ai = ai_calc(impl.bm, impl.sb, 0, 0);
   lines_killed = 0;
   beg_time = util_getticks();
+  impl.ai = ai_calc(impl.bm, impl.sb, 0, 0);
 }
 
 static void kill_lines_hook(struct blockmap_t* bm, int* lnbuf, int num) {

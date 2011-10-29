@@ -93,7 +93,7 @@ void main_loop(void) {
     } else {
       update();
     }
-    SDL_Delay(10);
+    SDL_Delay(1);
   } /* while no quit */
 }
 
