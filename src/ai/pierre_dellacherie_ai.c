@@ -41,6 +41,7 @@ struct ai_t* ai_calc(struct blockmap_t* bm, struct shapebuf_t* sb,
   struct shapebuf_t* test_sb = clone_shapebuf(sb);
 
   memset(&s_ai, 0, sizeof(s_ai));
+  s_ai.rating = -99999; /* a large negative number */
 
   for (rl_i = 0; rl_i != sizeof(rotate_list)/sizeof(*rotate_list); ++rl_i) {
     rotate = rotate_list[rl_i];
@@ -61,70 +62,26 @@ struct ai_t* ai_calc(struct blockmap_t* bm, struct shapebuf_t* sb,
 
       hard_drop_sb(test_sb, test_bm);
 
-      private_evalute(bm, sb, &rating, &priority);
+      private_evalute(test_bm, test_sb, &rating, &priority);
 
 
-      if (rating > s_ai.rating ||
+      if ((rating > s_ai.rating) ||
           ((rating == s_ai.rating) && (priority > s_ai.priority))) {
         s_ai.priority = priority;
         s_ai.rating = rating;
         s_ai.height = test_sb->y;
-        s_ai.move = x_pos;
-        s_ai.rotate = rotate;
+        s_ai.move = test_sb->x;
+        s_ai.rotate = test_sb->rotate;
       }
 
     }
   }
-
-  puts("");
 
   destroy_blockmap(test_bm);
   destroy_shapebuf(test_sb);
 
   return &s_ai;
 }
-
-int ai_step(struct ai_t* ai, struct blockmap_t* bm, struct shapebuf_t* sb) {
-  if (sb->rotate != ai->rotate) {
-    soft_rotate_sb(sb, 1, bm, 2);
-    return AI_ROTATE_RIGHT;
-  }
-
-  if (sb->x < ai->move) {
-    soft_move_sb(sb, 1, 0, bm);
-    return AI_MOVE_RIGHT;
-  } else if (sb->x > ai->move) {
-    soft_move_sb(sb, -1, 0, bm);
-    return AI_MOVE_LEFT;
-  }
-
-  if (sb->rotate < ai->rotate) {
-    soft_rotate_sb(sb, 1, bm, 2);
-    return AI_ROTATE_RIGHT;
-  } else if (sb->rotate > ai->rotate) {
-    soft_rotate_sb(sb, -1, bm, 2);
-    return AI_ROTATE_LEFT;
-  }
-
-  move_sb(sb, 0, 1);
-
-  if (check_sb(bm, sb) == 0) {
-    hard_drop_sb(sb, bm);
-    return AI_DROP;
-  } else {
-    move_sb(sb, 0, -1);
-    return AI_FREE;
-  }
-}
-
-void ai_do(struct ai_t* ai, struct blockmap_t* bm, struct shapebuf_t* sb) {
-  int result = 0;
-  while (result = ai_step(ai, bm, sb)) {
-    if (result == AI_FREE || result == AI_DROP) return;
-  }
-}
-
-
 
 
 
@@ -177,15 +134,6 @@ static void private_evalute(const struct blockmap_t* bm,
   *rating += ((-1.0) * _col_transition);
   *rating += ((-4.0) * _buried_holes);
   *rating += ((-1.0) * _board_wells);
-
-  printf("(%.1f, %.1f , %d, %d, %d, %d, %d)\n",
-         rating,
-         _landing_height,
-         _eroded_piece_cells_metric,
-         _row_transition,
-         _col_transition,
-         _buried_holes,
-         _board_wells);
 
 
   *priority = 0;

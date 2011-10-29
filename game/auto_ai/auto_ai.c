@@ -115,7 +115,7 @@ static void do_auto_move(void) {
 
 static void do_step_ai(void) {
   static unsigned long tick = 0;
-  if (util_getticks() - tick >= 50) {
+  if (util_getticks() - tick >= 1) {
     ai_step(impl.ai, impl.bm, impl.sb);
     tick = util_getticks();
   }
@@ -169,7 +169,7 @@ void destroy_game(void) {
 }
 
 static void newgame(void) {
-  game_ctrl.automove_interval = 300;
+  game_ctrl.automove_interval = 10;
   clear_blockmap(impl.bm);
   soft_reset_sb(impl.sb, shift_queue(impl.queue), impl.bm, 3);
   lines_killed = 0;

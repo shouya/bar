@@ -5,7 +5,6 @@
 struct blockmap_t;
 struct shapebuf_t;
 
-struct ai_t;
 
 #define AI_ROTATE_LEFT  0x1
 #define AI_ROTATE_RIGHT 0x2
@@ -13,6 +12,15 @@ struct ai_t;
 #define AI_MOVE_RIGHT   0x4
 #define AI_DROP         0x5
 #define AI_FREE         0x6
+#define AI_FAILED       0x7
+
+struct ai_t {
+  void* impl;
+  int xpos, height;
+  int rotate;
+};
+
+
 
 struct ai_t* ai_calc(struct blockmap_t* bm, struct shapebuf_t* sb,
                      int flags, void* data);
